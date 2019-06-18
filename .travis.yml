@@ -1,0 +1,21 @@
+language: rust
+matrix:
+  include:
+  - os: osx
+    rust: stable
+    env: TARGET=x86_64-apple-darwin
+  - os: linux
+    rust: stable
+    env: TARGET=x86_64-unknown-linux-gnu
+  - os: linux
+    rust: stable
+    env: TARGET=i686-unknown-linux-gnu
+  - os: linux
+    rust: stable
+    env: TARGET=aarch64-unknown-linux-gnu
+script:
+- cargo test --all
+- cargo test --all --no-default-features
+- if [ "$TARGET" = x86_64-unknown-linux-gnu ] && [ "$TRAVIS_RUST_VERSION" = stable
+  ]; then rustup component add rustfmt; rustfmt -vV; cargo fmt --all -- --check; fi
+
