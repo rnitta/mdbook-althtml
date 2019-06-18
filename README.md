@@ -18,6 +18,7 @@ some code
 For more details, see `example/`.
 
 # Todo
+- Add Clippy
 - Write and build docs.
 - Consider post-process with some context (RenderItemContext, RenderContext or something)
 - Modifiable handlebars "in rendering templates."
