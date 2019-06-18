@@ -1,6 +1,5 @@
 /// Just an example of post-processor.
 /// You can develop your post-processor with the pub trait PostProcessor.
-
 use crate::PostProcessor;
 use handlebars::Handlebars;
 use serde_json::{json, Value};

@@ -1,5 +1,5 @@
-use mdbook_althtml::post_processor::hbs_processor::HbsProcessor;
 use mdbook::MDBook;
+use mdbook_althtml::post_processor::hbs_processor::HbsProcessor;
 use mdbook_althtml::HtmlHandlebars;
 use std::path::Path;
 
@@ -12,8 +12,7 @@ fn main() {
     let root_dir = Path::new("./");
     let mut book = MDBook::load(root_dir).expect("invalid root_dir");
 
-    book
-        .with_renderer(altrenderer)
+    book.with_renderer(altrenderer)
         .build()
         .expect("Book generation failed");
 }
