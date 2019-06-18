@@ -4,7 +4,9 @@ use mdbook_althtml::HtmlHandlebars;
 use std::path::Path;
 
 fn main() {
-    let handlebar_postprocessor = HbsProcessor::new();
+    let mut handlebar_postprocessor = HbsProcessor::new();
+    handlebar_postprocessor.add_rule("marquee_start", "<marquee>");
+    handlebar_postprocessor.add_rule("marquee_end", "</marquee>");
     let mut altrenderer = HtmlHandlebars::new();
     altrenderer.change_output_dir("html");
     altrenderer.add_post_processor(handlebar_postprocessor);
