@@ -1,0 +1,19 @@
+[book]
+authors = ["rnitta<attinyes@gmail.com>"]
+multilingual = false
+src = "content"
+title = "mdbook-alhtml"
+
+[build]
+build-dir = "public"
+create-missing = false
+
+[output.althtml]
+curly-quotes = false
+default-theme = "original"
+git_repository_url = "https://github.com/rnitta/mdbook-althml"
+theme = "content/theme"
+
+[output.linkcheck]
+follow-web-links = false
+[preprocess.links]
