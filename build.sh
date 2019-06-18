@@ -2,5 +2,4 @@
 # build for netlify
 cd example
 curl https://sh.rustup.rs -sSf | sh -s - --default-toolchain nightly -y
-source ~/.cargo/env
-cargo run
+$HOME/.cargo/bin run
