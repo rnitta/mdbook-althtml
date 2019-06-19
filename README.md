@@ -1,4 +1,6 @@
 # mdbook-althtml
+[![Build Status](https://travis-ci.org/rnitta/mdbook-althtml.svg?branch=master)](https://travis-ci.org/rnitta/mdbook-althtml)  
+
 ***Now under development.***
 
 An alternative of the official [mdbook](https://github.com/rust-lang-nursery/mdBook) html renderer.  

@@ -12,13 +12,9 @@ pub struct HbsProcessor {
 }
 
 impl HbsProcessor {
-    pub fn new() -> Self {
-        Self { dict: json!({}) }
-    }
-
     /// Add simple key-value rule. Nesting is not permitted.
     pub fn add_rule(&mut self, k: &str, v: &str) {
-        if k.contains(".") || k.contains(".") {
+        if k.contains('.') || k.contains(' ') {
             panic!(format!(
                 r#"The key "{}" cannnot contain "." nor " (whitespace)""#,
                 k
@@ -65,13 +61,19 @@ impl HbsProcessor {
     }
 }
 
+impl Default for HbsProcessor {
+    /// Default initializer
+    fn default() -> Self {
+        Self { dict: json!({}) }
+    }
+}
+
 impl PostProcessor for HbsProcessor {
     fn execute(&self, html: &str) -> String {
-        let processed = Handlebars::new()
+        Handlebars::new()
             .render_template(&html, &self.dict)
             .unwrap_or_else(|_| panic!("Exception at hbs post-processor."))
-            .to_owned();
-        processed
+            .to_owned()
     }
 }
 

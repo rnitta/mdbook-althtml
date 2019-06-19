@@ -1,7 +1,5 @@
 # mdbook-althtml
-{{{ marquee_start }}}
-mdbook-althtml
-{{{ marquee_end }}}
+{{{ marquee_start }}}mdbook-althtml{{{ marquee_end }}}
 
 ## What's this?
 An alternative of the official [mdbook](https://github.com/rust-lang-nursery/mdBook) html renderer.  
