@@ -70,7 +70,7 @@ impl Default for HbsProcessor {
 
 impl PostProcessor for HbsProcessor {
     fn execute(&self, html: &str) -> String {
-        Handlebars::new()
+        Handlebars::default()
             .render_template(&html, &self.dict)
             .unwrap_or_else(|_| panic!("Exception at hbs post-processor."))
             .to_owned()
@@ -83,7 +83,7 @@ mod test {
 
     #[test]
     fn test_merge() {
-        let mut processor = HbsProcessor::new();
+        let mut processor = HbsProcessor::default();
         processor.merge(&json!({}));
         // blank + blank = blank
         assert_eq!(processor.dict, json!({}));
@@ -103,7 +103,7 @@ mod test {
 
     #[test]
     fn test_add_rule() {
-        let mut processor = HbsProcessor::new();
+        let mut processor = HbsProcessor::default();
         processor.add_rule("hoge", "fuga");
         assert_eq!(processor.dict, json!({"hoge": "fuga"}));
         processor.add_rule("foo", "bar");
@@ -112,7 +112,7 @@ mod test {
 
     #[test]
     fn test_load_json() {
-        let mut processor = HbsProcessor::new();
+        let mut processor = HbsProcessor::default();
         processor.load_json("./tests/1.json");
         assert_eq!(processor.dict, json!({"a": "b"}));
         processor.load_json("./tests/2.json");
@@ -124,7 +124,7 @@ mod test {
 
     #[test]
     fn test_load_toml() {
-        let mut processor = HbsProcessor::new();
+        let mut processor = HbsProcessor::default();
         processor.load_toml("./tests/1.toml");
         assert_eq!(processor.dict, json!({"a": "b"}));
         processor.load_toml("./tests/2.toml");
