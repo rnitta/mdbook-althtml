@@ -39,6 +39,7 @@ deploy:
   verbose: true
   on:
     branch: master
+    condition: $TARGET = x86_64-unknown-linux-gnu
 
 notifications:
   email:
