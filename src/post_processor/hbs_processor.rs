@@ -5,6 +5,7 @@ use handlebars::Handlebars;
 use serde_json::{json, Value};
 use std::fs;
 use toml;
+use mdbook::renderer::RenderContext;
 
 /// Post-processor using handlebars.
 pub struct HbsProcessor {
@@ -69,7 +70,7 @@ impl Default for HbsProcessor {
 }
 
 impl PostProcessor for HbsProcessor {
-    fn execute(&self, html: &str) -> String {
+    fn execute(&self, html: &str, _context: &RenderContext) -> String {
         Handlebars::default()
             .render_template(&html, &self.dict)
             .unwrap_or_else(|_| panic!("Exception at hbs post-processor."))

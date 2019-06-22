@@ -10,19 +10,20 @@ Developing renderer from scratch is not easy. So, we provide more modifiable ren
 
 For now, only post-processors can be added. 
 
-# fixme: Usage
+# todo: Docs
+https://rnitta.github.io/mdbook-althtml/
+
+# todo: Usage
 You can use this as well as official html renderer.
 
 ```rust
-some code
+some code here
 ```
 
 For more details, see `example/`.
 
 # Todo
-- Add Clippy
 - Write and build docs.
-- Consider post-process with some context (RenderItemContext, RenderContext or something)
 - Modifiable handlebars "in rendering templates."
 - Modifiable markdown converter.
 
