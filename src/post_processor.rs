@@ -2,12 +2,13 @@ use regex::{Captures, Regex};
 use std::collections::HashMap;
 
 use mdbook::config::Playpen;
+use mdbook::renderer::RenderContext;
 use mdbook::utils;
 
 pub mod hbs_processor;
 
 pub trait PostProcessor {
-    fn execute(&self, html: &str) -> String;
+    fn execute(&self, html: &str, ctx: &RenderContext) -> String;
 }
 
 // /////////// Ports of official built-in post-processors below //////////
@@ -18,7 +19,7 @@ pub trait PostProcessor {
 pub(crate) struct HeaderLinkProcessor;
 
 impl PostProcessor for HeaderLinkProcessor {
-    fn execute(&self, html: &str) -> String {
+    fn execute(&self, html: &str, _context: &RenderContext) -> String {
         let regex = Regex::new(r"<h(\d)>(.*?)</h\d>").unwrap();
         let mut id_counter = HashMap::new();
 
@@ -87,7 +88,7 @@ impl CodeBlockProcessor {
 }
 
 impl PostProcessor for CodeBlockProcessor {
-    fn execute(&self, html: &str) -> String {
+    fn execute(&self, html: &str, _context: &RenderContext) -> String {
         let regex = Regex::new(r##"<code([^>]+)class="([^"]+)"([^>]*)>"##).unwrap();
         regex
             .replace_all(html, |caps: &Captures<'_>| {
@@ -144,7 +145,7 @@ impl PlaypenProcessor {
 }
 
 impl PostProcessor for PlaypenProcessor {
-    fn execute(&self, html: &str) -> String {
+    fn execute(&self, html: &str, _context: &RenderContext) -> String {
         let regex = Regex::new(r##"((?s)<code[^>]?class="([^"]+)".*?>(.*?)</code>)"##).unwrap();
         regex
             .replace_all(html, |caps: &Captures<'_>| {

@@ -55,19 +55,20 @@ impl HtmlHandlebars {
     fn render_item(
         &self,
         item: &BookItem,
-        mut ctx: RenderItemContext<'_>,
+        mut item_ctx: RenderItemContext<'_>,
+        ctx: &RenderContext,
         print_content: &mut String,
     ) -> mdbook::errors::Result<()> {
         // FIXME: This should be made DRY-er and rely less on mutable state
         if let BookItem::Chapter(ref ch) = *item {
             let content = ch.content.clone();
-            let content = utils::render_markdown(&content, ctx.html_config.curly_quotes);
+            let content = utils::render_markdown(&content, item_ctx.html_config.curly_quotes);
 
             let string_path = ch.path.parent().unwrap().display().to_string();
 
             let fixed_content = utils::render_markdown_with_base(
                 &ch.content,
-                ctx.html_config.curly_quotes,
+                item_ctx.html_config.curly_quotes,
                 &string_path,
             );
             print_content.push_str(&fixed_content);
@@ -87,7 +88,7 @@ impl HtmlHandlebars {
             // Non-lexical lifetimes needed :'(
             let title: String;
             {
-                let book_title = ctx
+                let book_title = item_ctx
                     .data
                     .get("book_title")
                     .and_then(serde_json::Value::as_str)
@@ -95,32 +96,39 @@ impl HtmlHandlebars {
                 title = ch.name.clone() + " - " + book_title;
             }
 
-            ctx.data.insert("path".to_owned(), json!(path));
-            ctx.data.insert("content".to_owned(), json!(content));
-            ctx.data.insert("chapter_title".to_owned(), json!(ch.name));
-            ctx.data.insert("title".to_owned(), json!(title));
-            ctx.data.insert(
+            item_ctx.data.insert("path".to_owned(), json!(path));
+            item_ctx.data.insert("content".to_owned(), json!(content));
+            item_ctx
+                .data
+                .insert("chapter_title".to_owned(), json!(ch.name));
+            item_ctx.data.insert("title".to_owned(), json!(title));
+            item_ctx.data.insert(
                 "path_to_root".to_owned(),
                 json!(utils::fs::path_to_root(&ch.path)),
             );
 
             // Render the handlebars template with the data
             debug!("Render template");
-            let rendered = ctx.handlebars.render("index", &ctx.data)?;
+            let rendered = item_ctx.handlebars.render("index", &item_ctx.data)?;
 
-            let rendered = self.post_process(rendered, &ctx.html_config.playpen);
+            let rendered = self.post_process(rendered, &item_ctx.html_config.playpen, ctx);
 
             // Write to file
             debug!("Creating {}", filepath.display());
-            utils::fs::write_file(&ctx.destination, &filepath, rendered.as_bytes())?;
+            utils::fs::write_file(&item_ctx.destination, &filepath, rendered.as_bytes())?;
 
-            if ctx.is_index {
-                ctx.data.insert("path".to_owned(), json!("index.md"));
-                ctx.data.insert("path_to_root".to_owned(), json!(""));
-                let rendered_index = ctx.handlebars.render("index", &ctx.data)?;
-                let rendered_index = self.post_process(rendered_index, &ctx.html_config.playpen);
+            if item_ctx.is_index {
+                item_ctx.data.insert("path".to_owned(), json!("index.md"));
+                item_ctx.data.insert("path_to_root".to_owned(), json!(""));
+                let rendered_index = item_ctx.handlebars.render("index", &item_ctx.data)?;
+                let rendered_index =
+                    self.post_process(rendered_index, &item_ctx.html_config.playpen, ctx);
                 debug!("Creating index.html from {}", path);
-                utils::fs::write_file(&ctx.destination, "index.html", rendered_index.as_bytes())?;
+                utils::fs::write_file(
+                    &item_ctx.destination,
+                    "index.html",
+                    rendered_index.as_bytes(),
+                )?;
             }
         }
 
@@ -128,7 +136,12 @@ impl HtmlHandlebars {
     }
 
     #[cfg_attr(feature = "cargo-clippy", allow(clippy::let_and_return))]
-    fn post_process(&self, rendered: String, playpen_config: &Playpen) -> String {
+    fn post_process(
+        &self,
+        rendered: String,
+        playpen_config: &Playpen,
+        ctx: &RenderContext,
+    ) -> String {
         let mut rendered = rendered;
 
         // Built-in PostProcessors
@@ -139,12 +152,12 @@ impl HtmlHandlebars {
             vec![Box::new(hlp), Box::new(cbp), Box::new(ppp)];
 
         for p in &builtin_post_processors {
-            rendered = p.execute(&rendered);
+            rendered = p.execute(&rendered, ctx);
         }
 
         // User-define PostProcessors
         for p in &self.post_processors {
-            rendered = p.execute(&rendered);
+            rendered = p.execute(&rendered, ctx);
         }
 
         rendered
@@ -339,14 +352,14 @@ impl Renderer for HtmlHandlebars {
         // This is the flag to determine whether root index.html should be generated.
         let mut is_index = true;
         for item in book.iter() {
-            let ctx = RenderItemContext {
+            let item_ctx = RenderItemContext {
                 handlebars: &handlebars,
                 destination: destination.to_path_buf(),
                 data: data.clone(),
                 is_index,
                 html_config: html_config.clone(),
             };
-            self.render_item(item, ctx, &mut print_content)?;
+            self.render_item(item, item_ctx, ctx, &mut print_content)?;
             is_index = false;
         }
 
@@ -360,7 +373,7 @@ impl Renderer for HtmlHandlebars {
         debug!("Render template");
         let rendered = handlebars.render("index", &data)?;
 
-        let rendered = self.post_process(rendered, &html_config.playpen);
+        let rendered = self.post_process(rendered, &html_config.playpen, ctx);
 
         // Output all files other than chapters
         debug!("Create print.html");

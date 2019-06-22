@@ -2,6 +2,7 @@
 /// You can develop your post-processor with the pub trait PostProcessor.
 use crate::PostProcessor;
 use handlebars::Handlebars;
+use mdbook::renderer::RenderContext;
 use serde_json::{json, Value};
 use std::fs;
 use toml;
@@ -69,7 +70,7 @@ impl Default for HbsProcessor {
 }
 
 impl PostProcessor for HbsProcessor {
-    fn execute(&self, html: &str) -> String {
+    fn execute(&self, html: &str, _context: &RenderContext) -> String {
         Handlebars::default()
             .render_template(&html, &self.dict)
             .unwrap_or_else(|_| panic!("Exception at hbs post-processor."))
