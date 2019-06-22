@@ -98,7 +98,9 @@ impl HtmlHandlebars {
 
             item_ctx.data.insert("path".to_owned(), json!(path));
             item_ctx.data.insert("content".to_owned(), json!(content));
-            item_ctx.data.insert("chapter_title".to_owned(), json!(ch.name));
+            item_ctx
+                .data
+                .insert("chapter_title".to_owned(), json!(ch.name));
             item_ctx.data.insert("title".to_owned(), json!(title));
             item_ctx.data.insert(
                 "path_to_root".to_owned(),
@@ -119,9 +121,14 @@ impl HtmlHandlebars {
                 item_ctx.data.insert("path".to_owned(), json!("index.md"));
                 item_ctx.data.insert("path_to_root".to_owned(), json!(""));
                 let rendered_index = item_ctx.handlebars.render("index", &item_ctx.data)?;
-                let rendered_index = self.post_process(rendered_index, &item_ctx.html_config.playpen, ctx);
+                let rendered_index =
+                    self.post_process(rendered_index, &item_ctx.html_config.playpen, ctx);
                 debug!("Creating index.html from {}", path);
-                utils::fs::write_file(&item_ctx.destination, "index.html", rendered_index.as_bytes())?;
+                utils::fs::write_file(
+                    &item_ctx.destination,
+                    "index.html",
+                    rendered_index.as_bytes(),
+                )?;
             }
         }
 
@@ -129,7 +136,12 @@ impl HtmlHandlebars {
     }
 
     #[cfg_attr(feature = "cargo-clippy", allow(clippy::let_and_return))]
-    fn post_process(&self, rendered: String, playpen_config: &Playpen, ctx: &RenderContext) -> String {
+    fn post_process(
+        &self,
+        rendered: String,
+        playpen_config: &Playpen,
+        ctx: &RenderContext,
+    ) -> String {
         let mut rendered = rendered;
 
         // Built-in PostProcessors

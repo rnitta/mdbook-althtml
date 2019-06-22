@@ -2,8 +2,8 @@ use regex::{Captures, Regex};
 use std::collections::HashMap;
 
 use mdbook::config::Playpen;
-use mdbook::utils;
 use mdbook::renderer::RenderContext;
+use mdbook::utils;
 
 pub mod hbs_processor;
 
