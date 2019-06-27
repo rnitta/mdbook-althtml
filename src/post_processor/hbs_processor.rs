@@ -81,6 +81,8 @@ impl PostProcessor for HbsProcessor {
 #[cfg(test)]
 mod test {
     use super::*;
+    use mdbook::{book::Book, config::Config};
+    use std::path::Path;
 
     #[test]
     fn test_merge() {
@@ -133,5 +135,20 @@ mod test {
             processor.dict,
             json!({"a": "b", "c": "d", "e": { "f": "g" }})
         );
+    }
+
+    #[test]
+    fn test_execute() {
+        let dummy_book = Book::new();
+        let dummy_config = Config::from_disk(Path::new("./example/book.toml")).unwrap();
+        let dummy_render_context = RenderContext::new("", dummy_book, dummy_config, "");
+        let mut processor = HbsProcessor::default();
+        processor.add_rule("hoge", "fuga");
+        let before = "aaa{{ hoge }}aaa";
+        let after = "aaafugaaaa";
+        assert_eq!(
+            processor.execute(before, &dummy_render_context),
+            after.to_owned()
+        )
     }
 }
